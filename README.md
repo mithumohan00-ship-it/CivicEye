@@ -54,24 +54,20 @@ This creates a **transparent bridge between citizens and governance.**
 # 📸 Project Screenshots
 
 ## 🏠 User Reporting Interface
-<img src="screenshots/report-page.png" width="800">
-
-Users upload images of civic issues like potholes, garbage dumps, or damaged infrastructure.
-
----
-
-## 🗺️ Civic Issue Map Dashboard
-<img src="screenshots/map-dashboard.png" width="800">
-
-Interactive dashboard showing reported issues across the city with location markers.
-
----
-
-## 📊 Admin Monitoring Panel
-<img src="screenshots/admin-panel.png" width="800">
-
-Authorities can monitor reports, analyze issue clusters, and prioritize repairs.
-
+<img src="0'0.png" width="800">
+<img src="0.png" width="800">
+<img src="1.png" width="800">
+<img src="2.png" width="800">
+<img src="3.png" width="800">
+<img src="4.png" width="800">
+<img src="5.png" width="800">
+<img src="6.png" width="800">
+<img src="7.png" width="800">
+<img src="8.png" width="800">
+<img src="9.png" width="800">
+<img src="10.png" width="800">
+<img src="11.png" width="800">
+<img src="12.png" width="800">
 ---
 
 # ⚡ Key Features
