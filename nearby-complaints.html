@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicEye | Nearby Issues</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #0f172a;
+            --glass: rgba(30, 41, 59, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --pending: #ef4444;
+            --progress: #f59e0b;
+            --resolved: #10b981;
+        }
+
+        [data-theme="light"] {
+            --bg: #f1f5f9;
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(15, 23, 42, 0.08);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --primary: #4f46e5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 8%; background: var(--glass);
+            backdrop-filter: blur(12px); border-bottom: 1px solid var(--glass-border);
+            position: sticky; top: 0; z-index: 1000;
+        }
+
+        .logo { font-size: 24px; font-weight: 700; color: var(--text-main); text-decoration: none; }
+        .nav-links { display: flex; gap: 30px; }
+        .nav-links a { text-decoration: none; color: var(--text-muted); transition: 0.3s; }
+        .nav-links a:hover { color: var(--text-main); }
+
+        .container { padding: 40px 8%; }
+        h2 { font-size: 2rem; margin-bottom: 30px; color: var(--text-main); }
+
+        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; margin-bottom: 30px; }
+
+        .glass-panel {
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 24px;
+            padding: 25px; overflow: hidden;
+        }
+
+        #map { height: 450px; border-radius: 16px; z-index: 1; border: 1px solid var(--glass-border); }
+
+        table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+        th { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; padding: 10px 20px; text-align: left; }
+        td { background: rgba(128, 128, 128, 0.05); padding: 16px 20px; font-size: 0.9rem; color: var(--text-main); }
+        td:first-child { border-radius: 12px 0 0 12px; }
+        td:last-child { border-radius: 0 12px 12px 0; }
+
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+        .pending { background: rgba(239, 68, 68, 0.15); color: var(--pending); }
+        .progress { background: rgba(245, 158, 11, 0.15); color: var(--progress); }
+        .resolved { background: rgba(16, 185, 129, 0.15); color: var(--resolved); }
+
+        @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+
+<body>
+
+<div style="padding: 12px 8%; margin-bottom: 20px; background: var(--glass); border-bottom: 1px solid var(--glass-border);">
+    <a href="index.html" style="color: var(--text-muted); text-decoration: none; font-weight: 500;">← Back to Home</a>
+</div>
+<div class="container">
+    <h2>Real-time Civic Insights</h2>
+
+    <div class="dashboard-grid">
+        <div class="glass-panel">
+            <h3>Live Complaint Map</h3>
+            <div id="map"></div>
+        </div>
+
+        <div class="glass-panel chart-container">
+            <h3>Resolution Status</h3>
+            <canvas id="complaintChart"></canvas>
+        </div>
+    </div>
+
+    <div class="glass-panel">
+        <h3>Recent Reports</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr><th>ID</th><th>Reporter</th><th>Category</th><th>Coordinates</th><th>Status</th></tr>
+                </thead>
+                <tbody id="complaintsTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+// --- THEME & MAP INITIALIZATION ---
+const map = L.map('map').setView([12.9716, 77.5946], 13);
+let userLocation = null;
+
+function initMapTiles() {
+    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    if (window.currentTileLayer) map.removeLayer(window.currentTileLayer);
+    window.currentTileLayer = L.tileLayer(tileUrl).addTo(map);
+}
+
+// Calculate distance between two coordinates (Haversine formula)
+function getDistanceKm(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2-lat1) * Math.PI/180;
+    const dLon = (lon2-lon1) * Math.PI/180;
+
+    const a =
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+initMapTiles();
+
+// --- SUPABASE & LOGIC ---
+document.addEventListener("DOMContentLoaded", async function () {
+    // Get user's live location
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+            userLocation = {
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude
+            };
+
+            // Move map to user's location
+            map.setView([userLocation.lat, userLocation.lng], 14);
+
+            // Marker for user
+            L.marker([userLocation.lat, userLocation.lng])
+              .addTo(map)
+              .bindPopup("📍 Your Location")
+              .openPopup();
+        });
+    }
+
+    const supabaseUrl = "https://gxtyigjradpdywjrjqhu.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4dHlpZ2pyYWRwZHl3anJqcWh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMjU0NTgsImV4cCI6MjA4ODkwMTQ1OH0.1lPh99Ut6Fv5ViJ_yysOwwpKk5keaKJTUaqKzFXs_70";
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    const tableBody = document.getElementById("complaintsTableBody");
+    const ctx = document.getElementById('complaintChart').getContext('2d');
+    let chart;
+
+    async function loadComplaints() {
+        tableBody.innerHTML = "";
+        let pending = 0, progress = 0, resolved = 0;
+
+        map.eachLayer((layer) => {
+            if (layer instanceof L.CircleMarker) map.removeLayer(layer);
+        });
+
+        const { data } = await supabase.from("complaints").select("*");
+        if (!data) return;
+
+        data.forEach(c => {
+
+            // Filter complaints within 5 km radius
+            if (userLocation && c.latitude && c.longitude) {
+                const distance = getDistanceKm(
+                    userLocation.lat,
+                    userLocation.lng,
+                    c.latitude,
+                    c.longitude
+                );
+
+                if (distance > 5) return; // skip far complaints
+            }
+
+            let badgeClass = "", markerColor = "#6366f1";
+            if (c.status === "Pending") { pending++; badgeClass = "pending"; markerColor = "#ef4444"; }
+            else if (c.status === "In Progress") { progress++; badgeClass = "progress"; markerColor = "#f59e0b"; }
+            else if (c.status === "Resolved") { resolved++; badgeClass = "resolved"; markerColor = "#10b981"; }
+
+            tableBody.innerHTML += `
+                <tr class="complaint-row" style="cursor:pointer" onclick="map.setView([${c.latitude}, ${c.longitude}], 17)">
+                    <td style="font-weight:bold;">${c.complaint_id || 'N/A'}</td>
+                    <td>${c.name || 'Anonymous'}</td>
+                    <td>${c.issue || 'Other'}</td>
+                    <td style="font-family: monospace; font-size: 0.8rem;">${parseFloat(c.latitude).toFixed(4)}, ${parseFloat(c.longitude).toFixed(4)}</td>
+                    <td><span class="status-badge ${badgeClass}">${c.status}</span></td>
+                </tr>`;
+
+            if (c.latitude && c.longitude) {
+                L.circleMarker([c.latitude, c.longitude], {
+                    radius: 8,
+                    color: markerColor,
+                    fillColor: markerColor,
+                    fillOpacity: 0.6,
+                    weight: 2
+                })
+                .addTo(map)
+                .bindPopup(`<b>${c.issue}</b><br>Status: ${c.status}`);
+            }
+        });
+
+        if (chart) chart.destroy();
+        chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pending', 'In Progress', 'Resolved'],
+                datasets: [{
+                    data: [pending, progress, resolved],
+                    backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                plugins: { legend: { position: 'bottom', labels: { color: '#475569' } } },
+                cutout: '70%'
+            }
+        });
+    }
+
+    loadComplaints();
+    supabase.channel('complaints-channel').on('postgres_changes', { event: '*', schema: 'public', table: 'complaints' }, () => loadComplaints()).subscribe();
+});
+</script>
+
+</body>
+</html>

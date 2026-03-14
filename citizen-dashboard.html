@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicEye | My Impact Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --glass: rgba(30, 41, 59, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+            --green: #10b981;
+        }
+
+        [data-theme="light"] {
+            --bg: #f1f5f9;
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(15, 23, 42, 0.08);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --primary: #4f46e5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background: var(--bg); 
+            color: var(--text-main); 
+            padding: 20px; 
+            background-image: radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.1) 0, transparent 40%);
+            transition: background 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+        }
+        
+        .container { max-width: 900px; margin: 40px auto; }
+        
+        .login-box { 
+            background: var(--glass); 
+            padding: 40px; 
+            border-radius: 24px; 
+            border: 1px solid var(--glass-border); 
+            text-align: center; 
+            margin-bottom: 40px; 
+            backdrop-filter: blur(10px); 
+        }
+        
+        input { 
+            background: var(--bg); 
+            border: 1px solid var(--glass-border); 
+            padding: 14px 20px; 
+            border-radius: 12px; 
+            color: var(--text-main); 
+            width: 320px; 
+            margin-bottom: 15px;
+            outline: none; 
+            display: block;
+            margin: 0 auto 20px auto;
+            text-align: center;
+        }
+        
+        .btn { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 14px 40px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-weight: 700; 
+            transition: 0.3s;
+        }
+        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; display: none; }
+        
+        .stat-card { 
+            background: var(--glass); 
+            border: 1px solid var(--glass-border); 
+            padding: 25px; 
+            border-radius: 20px; 
+            text-align: center; 
+        }
+        
+        .stat-card h3 { font-size: 2.2rem; color: var(--primary); }
+        .stat-card p { color: var(--text-muted); font-size: 0.7rem; letter-spacing: 1px; }
+
+        .report-card { 
+            background: var(--glass); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 24px; 
+            padding: 25px; 
+            display: none; 
+        }
+        
+        .complaint-item { 
+            background: rgba(255,255,255,0.02); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 18px; 
+            padding: 20px; 
+            margin-bottom: 15px; 
+        }
+        
+        .timeline-container { display: flex; justify-content: space-between; position: relative; margin: 25px 0 10px 0; padding: 0 15px; }
+        .timeline-container::before { content: ''; position: absolute; top: 15px; left: 10%; width: 80%; height: 2px; background: var(--glass-border); }
+        
+        .step { position: relative; z-index: 2; text-align: center; width: 33%; }
+        .dot { 
+            width: 32px; 
+            height: 32px; 
+            background: var(--bg); 
+            border: 2px solid var(--glass-border); 
+            border-radius: 50%; 
+            margin: 0 auto 8px auto; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 12px; 
+            color: var(--text-muted);
+            transition: 0.4s;
+        }
+        
+        .step.completed .dot { background: var(--green); border-color: var(--green); color: white; }
+        .step.active .dot { background: var(--primary); border-color: var(--primary); color: white; }
+        .step p { font-size: 0.65rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+
+        .status-badge { padding: 5px 14px; border-radius: 50px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        .status-Pending { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+        .status-In-Progress { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+        .status-Resolved { color: #10b981; background: rgba(16, 185, 129, 0.1); }
+    </style>
+</head>
+<body>
+    <div style="padding: 12px 5%; margin: -20px -20px 30px -20px; background: var(--glass); border-bottom: 1px solid var(--glass-border); backdrop-filter: blur(10px);">
+        <a href="index.html" style="color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 0.9rem;">← Exit Dashboard</a>
+    </div>
+
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-size: 2.5rem; letter-spacing: -1px;">Impact Tracker</h1>
+            <p style="color: var(--text-muted);">Monitor your contributions to Bengaluru's smart infrastructure.</p>
+        </div>
+        
+        <div class="login-box" id="loginArea">
+            <h3 style="margin-bottom: 20px;">Enter your registered name</h3>
+            <input type="text" id="userName" placeholder="Full Name (e.g. Mithun Mohan)">
+            <button class="btn" onclick="fetchUserData()">Track My Impact</button>
+        </div>
+        
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><h3 id="stat-total">0</h3><p>TOTAL REPORTS</p></div>
+            <div class="stat-card"><h3 id="stat-points">0</h3><p>CITIZEN SCORE</p></div>
+            <div class="stat-card"><h3 id="stat-rank">--</h3><p>TIER STATUS</p></div>
+        </div>
+        
+        <div id="reportList" class="report-card">
+            <h3 style="margin-bottom: 20px; font-size: 1.2rem;">Live Resolution Timeline</h3>
+            <div id="complaintsContainer"></div>
+        </div>
+    </div>
+
+    
+
+    <script>
+        const supabaseUrl = "https://gxtyigjradpdywjrjqhu.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4dHlpZ2pyYWRwZHl3anJqcWh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMjU0NTgsImV4cCI6MjA4ODkwMTQ1OH0.1lPh99Ut6Fv5ViJ_yysOwwpKk5keaKJTUaqKzFXs_70";
+        const _supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function fetchUserData() {
+            const name = document.getElementById('userName').value.trim(); 
+            if(!name) return alert("Please enter your name.");
+
+            // Searching by 'name' column instead of 'phone'
+            const { data, error } = await _supabase
+                .from('complaints')
+                .select('*')
+                .ilike('name', `%${name}%`) // Uses case-insensitive partial match for better UX
+                .order('created_at', { ascending: false });
+            
+            if (error || !data.length) return alert("No reports found under this name.");
+
+            document.getElementById('statsGrid').style.display = 'grid'; 
+            document.getElementById('reportList').style.display = 'block'; 
+            document.getElementById('loginArea').style.display = 'none';
+
+            const total = data.length, 
+                  resolved = data.filter(c => c.status === 'Resolved').length, 
+                  points = (total * 10) + (resolved * 50);
+
+            document.getElementById('stat-total').innerText = total; 
+            document.getElementById('stat-points').innerText = points; 
+            
+            // Tier Logic
+            if(points >= 200) document.getElementById('stat-rank').innerText = "Elite Guardian";
+            else if(points >= 50) document.getElementById('stat-rank').innerText = "Active Guardian";
+            else document.getElementById('stat-rank').innerText = "Civic Cadet";
+
+            document.getElementById('complaintsContainer').innerHTML = data.map(c => {
+                // Timeline logic
+                const s2Completed = (c.status === "In Progress" || c.status === "Resolved");
+                const s2Active = (c.status === "In Progress");
+                const s3Completed = (c.status === "Resolved");
+                
+                return `
+                <div class="complaint-item">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h4 style="font-size:1.1rem; margin-bottom: 4px;">${c.issue}</h4>
+                            <p style="font-size:0.75rem; color:var(--text-muted);">Case ID: #${c.complaint_id}</p>
+                        </div>
+                        <span class="status-badge status-${c.status.replace(/\s+/g, '-')}">${c.status}</span>
+                    </div>
+                    <div class="timeline-container">
+                        <div class="step completed">
+                            <div class="dot">✓</div>
+                            <p>Reported</p>
+                        </div>
+                        <div class="step ${s3Completed ? 'completed' : (s2Active ? 'active' : '')}">
+                            <div class="dot">${s3Completed ? '✓' : '2'}</div>
+                            <p>In Review</p>
+                        </div>
+                        <div class="step ${s3Completed ? 'completed' : ''}">
+                            <div class="dot">${s3Completed ? '✓' : '3'}</div>
+                            <p>Resolved</p>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+    </script>
+</body>
+</html>

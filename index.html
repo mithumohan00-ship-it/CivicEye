@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicEye | Bengaluru AI Smart City Hub</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(15, 23, 42, 0.08);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --primary: #4f46e5;
+            --accent-purple: #8b5cf6;
+            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        
+        body { 
+            background: var(--bg); 
+            color: var(--text-main); 
+            line-height: 1.6; 
+            overflow-x: hidden;
+            background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0, transparent 40%);
+        }
+
+        /* NAVIGATION */
+        nav {
+            display: flex; justify-content: space-between; align-items: center; padding: 12px 5%;
+            position: sticky; top: 0; z-index: 1000; background: var(--glass);
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border);
+        }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1400px; margin: 0 auto; }
+        .logo { display: flex; align-items: center; gap: 10px; font-size: 1.5rem; font-weight: 800; color: var(--text-main); text-decoration: none; letter-spacing: -1px; }
+        .nav-links { display: flex; align-items: center; gap: 12px; }
+        .glass-btn { background: transparent; border: 1px solid var(--glass-border); color: var(--text-muted); padding: 10px 20px; border-radius: 12px; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: 0.3s; cursor: pointer; }
+        .btn-primary { background: var(--primary) !important; color: white !important; border: none !important; padding: 10px 24px !important; font-weight: 700 !important; box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.25); }
+
+        /* HERO SECTION */
+        .hero { 
+            padding: 80px 8% 120px 8%; 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 50px; 
+            align-items: center; 
+            min-height: 90vh; 
+            opacity: 0; transform: translateY(20px); animation: fadeInUp 0.8s forwards; 
+        }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        .hero-text { max-width: 650px; }
+        .hero-h1 { font-size: clamp(2.5rem, 5vw, 4.2rem); line-height: 1.1; letter-spacing: -2.5px; margin-bottom: 24px; font-weight: 800; }
+        .hero-h1 span { background: linear-gradient(90deg, var(--primary), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .hero-visuals { position: relative; }
+        .floating-dashboard {
+            background: #ffffff; border: 1px solid var(--glass-border); border-radius: 28px; padding: 20px;
+            box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.25); width: 100%; aspect-ratio: 16/10;
+            display: flex; flex-direction: column; gap: 12px; position: relative;
+            transform: perspective(1000px) rotateY(-10deg) rotateX(5deg);
+        }
+        .mock-card { background: rgba(0,0,0,0.02); border-radius: 12px; height: 70px; display: flex; flex-direction: column; justify-content: center; padding: 15px; }
+        .mock-line { background: var(--primary); height: 5px; width: 60%; border-radius: 10px; margin-bottom: 5px; }
+
+        .desi-badge { position: absolute; padding: 10px 18px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; box-shadow: 0 10px 20px rgba(0,0,0,0.1); backdrop-filter: blur(5px); z-index: 10; }
+        .badge-1 { top: -20px; left: -30px; background: rgba(16, 185, 129, 0.9); color: white; }
+        .badge-2 { bottom: 50px; right: -20px; background: #ffffff; color: var(--text-main); border: 1px solid var(--glass-border); }
+
+        /* REPLACEMENT SECTION: DIAGNOSTICS */
+        #diagnostics { background: rgba(79, 70, 229, 0.03); border-radius: 60px; margin: 0 20px 60px 20px; padding: 80px 8%; }
+        .diag-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; }
+        .scan-line { height: 2px; width: 100%; background: var(--primary); position: absolute; top: 0; left: 0; animation: scan 3s infinite linear; opacity: 0.5; }
+        @keyframes scan { from { top: 0; } to { top: 100%; } }
+
+        /* CARDS */
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; max-width: 1400px; margin: 0 auto; }
+        .card { background: #ffffff; border: 1px solid var(--glass-border); padding: 35px; border-radius: 28px; box-shadow: var(--card-shadow); transition: 0.4s; position: relative; overflow: hidden; }
+
+        .prediction-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--glass-border); font-size: 0.9rem; }
+        .risk-high { color: #dc2626; font-weight: 800; }
+        .ai-badge { background: rgba(79, 70, 229, 0.1); color: var(--primary); padding: 6px 16px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; display: inline-block; border: 1px solid rgba(79, 70, 229, 0.2); margin-bottom: 20px;}
+
+        .util-bar { height: 6px; background: #e2e8f0; border-radius: 10px; margin: 8px 0 18px 0; overflow: hidden; }
+        .util-fill { height: 100%; background: var(--primary); }
+
+        footer { background: #f1f5f9; padding: 60px 8% 40px; border-top: 1px solid var(--glass-border); margin-top: 50px; text-align: center; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">👁️ CivicEye</a>
+            <div class="nav-links">
+                <a href="city-insights.html" class="glass-btn">Insights</a>
+                <a href="nearby-complaints.html" class="glass-btn">Live Map</a>
+                <a href="citizen-dashboard.html" class="glass-btn">Impact Profile</a>
+                <a href="admin.html" class="glass-btn" style="border-color: var(--accent-purple);">🔐 Admin Portal</a>
+                <a href="complaint.html" class="glass-btn btn-primary">Report Issue Now</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-text">
+            <div class="ai-badge">v2.0: NAMMA BENGALURU LIVE</div>
+            <h1 class="hero-h1">Building a <span>Smarter Ooru</span> with AI-Driven Action.</h1>
+            <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 40px;">
+                Direct digital bridge from your phone to the ward office. Neural networks ensure your report reaches the boots on the ground instantly.
+            </p>
+            <div style="display: flex; gap: 20px;">
+                <a href="complaint.html" class="glass-btn btn-primary" style="padding: 18px 40px; text-decoration: none;">Start Reporting</a>
+                <a href="#diagnostics" class="glass-btn" style="padding: 18px 40px;">System Health</a>
+            </div>
+        </div>
+
+        <div class="hero-visuals">
+            <div class="floating-dashboard">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(0,0,0,0.05); padding-bottom:10px;">
+                    <span style="font-weight:800; font-size:1.1rem; color:var(--text-main);">BBMP Command Hub</span>
+                    <div style="width:12px; height:12px; border-radius:50%; background:#10b981;"></div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top:15px;">
+                    <div class="mock-card"><p style="font-size:0.6rem;">ACTIVE TICKETS</p><p style="font-size:1.6rem; font-weight:800; color:var(--primary);">452</p></div>
+                    <div class="mock-card" style="align-items:center;"><img src="https://cdn-icons-png.flaticon.com/512/1063/1063376.png" style="height:35px; opacity:0.3;"></div>
+                    <div class="mock-card" style="border:2px solid var(--accent-purple);"><p style="font-size:0.6rem;">AI DISPATCH</p><p style="font-size:1.1rem; font-weight:800; color:var(--accent-purple);">98 tasks/hr</p></div>
+                </div>
+                <div class="mock-card" style="height:80px; margin-top:10px; position:relative;">
+                    <div class="mock-line"></div><div class="mock-line" style="width:90%;"></div>
+                    <span style="position:absolute; bottom:10px; right:15px; color:#10b981; font-weight:700; font-size:0.7rem;">Verified by AI Vision</span>
+                </div>
+            </div>
+            <div class="desi-badge badge-1">✅ Resolve</div>
+            <div class="desi-badge badge-2">BBMP WARD ROUTING</div>
+        </div>
+    </section>
+
+    <section id="diagnostics">
+        <div style="margin-bottom: 60px; text-align: center;">
+            <span class="ai-badge">SMART CITY PULSE</span>
+            <h2 style="font-size: 2.5rem; margin-top: 15px;">Neural Infrastructure Audit</h2>
+        </div>
+        
+        <div class="diag-grid">
+            <div class="card">
+                <div class="scan-line"></div>
+                <h4 style="margin-bottom: 20px;">AI Vision Scan</h4>
+                <div style="background: #f1f5f9; height: 200px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--text-muted); text-align: center; padding: 20px;">
+                    [Analyzing real-time video feeds for road surface degradation...]
+                </div>
+                <div style="margin-top: 20px;">
+                    <p style="font-size: 0.8rem; font-weight: 700;">Detection Accuracy: 98.2%</p>
+                    <div class="util-bar"><div class="util-fill" style="width: 98%;"></div></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4 style="margin-bottom: 20px;">Ward Maintenance Priority</h4>
+                <div class="prediction-item">
+                    <span>Indiranagar (Drainage Network)</span>
+                    <span class="risk-high">CRITICAL</span>
+                </div>
+                <div class="prediction-item">
+                    <span>Whitefield (Grid Infrastructure)</span>
+                    <span style="color:#f59e0b; font-weight:800;">ELEVATED</span>
+                </div>
+                <div class="prediction-item">
+                    <span>Electronic City (Road Safety)</span>
+                    <span class="risk-high">CRITICAL</span>
+                </div>
+                <div class="prediction-item">
+                    <span>HSR Layout (Sanitation)</span>
+                    <span style="color:#10b981; font-weight:800;">STABLE</span>
+                </div>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 25px;">
+                    *AI-calculated priority score based on ticket density and incident severity.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section id="leaderboard" style="padding-bottom: 80px;">
+        <div class="grid-3">
+            <div class="card">
+                <h3>🏆 Bengaluru Guardians</h3>
+                <p style="font-size: 0.85rem; margin-bottom: 20px;"><a href="leaderboard.html" style="color: var(--primary); text-decoration: none; font-weight: bold;">VIEW FULL RANKINGS →</a></p>
+                <div class="prediction-item"><span>1. Mithun Mohan</span><span style="color:#059669; font-weight:bold;">4,250 PTS</span></div>
+                <div class="prediction-item"><span>2. Suresh K.</span><span>3,100 PTS</span></div>
+                <div class="prediction-item"><span>3. Ananya Rao</span><span>2,850 PTS</span></div>
+            </div>
+
+            <div class="card">
+                <h3>📍 Resource Strategy</h3>
+                <div style="margin-top: 25px;">
+                    <p style="font-size: 0.7rem; color:var(--text-muted); text-transform: uppercase;">Sanitation Fleet</p>
+                    <div class="util-bar"><div class="util-fill" style="width: 85%;"></div></div>
+                    <p style="font-size: 0.7rem; color:var(--text-muted); text-transform: uppercase;">Road Repair Unit</p>
+                    <div class="util-bar"><div class="util-fill" style="width: 92%; background: #ef4444;"></div></div>
+                </div>
+            </div>
+
+            <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                <div style="font-size: 3.5rem; font-weight: 800; color: var(--primary);">94%</div>
+                <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 700;">DEPLOYMENT EFFICIENCY</p>
+                <div style="margin-top: 20px; padding: 8px 16px; background: #ecfdf5; border-radius: 50px; color: #059669; font-size: 0.75rem; font-weight: bold;">SYSTEM OPTIMIZED</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p style="color: var(--text-muted); font-size: 0.8rem;">© 2026 CivicEye Bengaluru | Built for Bengaluru 2.0</p>
+    </footer>
+
+    
+
+    <script>
+        const supabaseUrl = "https://gxtyigjradpdywjrjqhu.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4dHlpZ2pyYWRwZHl3anJqcWh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMjU0NTgsImV4cCI6MjA4ODkwMTQ1OH0.1lPh99Ut6Fv5ViJ_yysOwwpKk5keaKJTUaqKzFXs_70";
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        document.documentElement.setAttribute('data-theme', 'light');
+    </script>
+</body>
+</html>

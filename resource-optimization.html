@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicEye | Resource Optimization</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* Default Dark Theme variables */
+            --bg: #0f172a;
+            --glass: rgba(30, 41, 59, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+        }
+
+        [data-theme="light"] {
+            /* Professional Light Theme variables */
+            --bg: #f1f5f9;
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(15, 23, 42, 0.08);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --primary: #4f46e5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background: var(--bg); 
+            color: var(--text-main); 
+            padding: 2rem; 
+            background-image: radial-gradient(at 0% 100%, rgba(59, 130, 246, 0.1) 0, transparent 50%);
+            transition: background 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+        }
+
+        header { margin-bottom: 3rem; }
+        header h1 { color: var(--text-main); font-weight: 700; }
+        header p { color: var(--text-muted); }
+
+        .grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; }
+        
+        .card { 
+            background: var(--glass); 
+            border: 1px solid var(--glass-border); 
+            padding: 2rem; 
+            border-radius: 24px; 
+            backdrop-filter: blur(10px); 
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .util-bar { 
+            height: 10px; 
+            background: var(--glass-border); 
+            border-radius: 10px; 
+            margin: 10px 0 20px 0; 
+            overflow: hidden; 
+        }
+
+        .util-fill { 
+            height: 100%; 
+            background: var(--primary); 
+            transition: width 1s ease-in-out;
+        }
+
+        .efficiency-val { 
+            font-size: 4rem; 
+            color: #10b981; 
+            margin: 1rem 0; 
+            font-weight: 700;
+        }
+
+        .status-badge {
+            margin-top: 2rem; 
+            padding: 1rem; 
+            background: rgba(16, 185, 129, 0.1); 
+            border-radius: 12px; 
+            color: #10b981; 
+            font-weight: bold; 
+            font-size: 0.8rem;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div style="padding: 12px 5%; margin: -2rem -2rem 2rem -2rem; background: var(--glass); border-bottom: 1px solid var(--glass-border);">
+        <a href="index.html" style="color: var(--text-muted); text-decoration: none; font-weight: 500;">← Back to Home</a>
+    </div>
+    <header>
+        <h1>📍 Resource Deployment Strategy</h1>
+        <p>AI-driven allocation of municipal field units based on real-time incident clusters.</p>
+    </header>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Departmental Unit Utilization</h3>
+            
+            <div style="margin-top: 2rem;">
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Sanitation Dept (Waste Management)</p>
+                <div class="util-bar"><div class="util-fill" style="width: 85%;"></div></div>
+                
+                <p style="font-size: 0.8rem; color: var(--text-muted);">BESCOM (Electrical Repair)</p>
+                <div class="util-bar"><div class="util-fill" style="width: 42%;"></div></div>
+                
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Road & Transport (Pothole Fixing)</p>
+                <div class="util-bar"><div class="util-fill" style="width: 92%; background: #ef4444;"></div></div>
+            </div>
+        </div>
+        
+        <div class="card" style="text-align: center; display: flex; flex-direction: column; justify-content: center;">
+            <h3>Efficiency Score</h3>
+            <div class="efficiency-val">94%</div>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Resource Allocation Accuracy</p>
+            <div class="status-badge">
+                OPTIMIZED DEPLOYMENT ACTIVE
+            </div>
+        </div>
+    </div>
+
+    <script></script>
+</body>
+</html>

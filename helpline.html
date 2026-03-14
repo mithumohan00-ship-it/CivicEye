@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicEye | Bengaluru Emergency Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* THEME ENGINE VARIABLES */
+        :root {
+            --bg: #0f172a;
+            --glass: rgba(30, 41, 59, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+            
+            /* Fixed Category Colors */
+            --red-alert: #ef4444; 
+            --blue-utility: #3b82f6;
+            --green-civic: #10b981;
+            --orange-safety: #f59e0b;
+        }
+
+        [data-theme="light"] {
+            --bg: #f1f5f9;
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(15, 23, 42, 0.08);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --primary: #4f46e5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background: var(--bg); 
+            color: var(--text-main); 
+            padding: 20px;
+            background-image: radial-gradient(circle at top right, rgba(239, 68, 68, 0.1), transparent 40%);
+            line-height: 1.5;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container { max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
+        
+        header { text-align: center; margin: 30px 0 40px 0; }
+        header h1 { font-size: 2.2rem; color: var(--red-alert); margin-bottom: 10px; font-weight: 700; }
+        header p { color: var(--text-muted); font-size: 0.95rem; }
+
+        .emergency-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 30px; }
+
+        .hotline-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 18px 22px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .hotline-card:active { 
+            transform: scale(0.96); 
+            background: rgba(255, 255, 255, 0.12); 
+        }
+
+        .info h3 { font-size: 1.1rem; margin-bottom: 2px; font-weight: 600; }
+        .info p { font-size: 0.8rem; color: var(--text-muted); }
+        .info .phone-no { font-family: monospace; color: var(--text-main); font-size: 1.1rem; margin-top: 5px; display: block; font-weight: 700; }
+
+        .call-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            color: white; /* Icons remain white for contrast */
+        }
+
+        .category-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+            display: block;
+            font-weight: 800;
+            opacity: 0.9;
+        }
+
+        .back-nav { 
+            margin-bottom: 10px; 
+            display: inline-flex; 
+            align-items: center;
+            color: var(--text-muted); 
+            text-decoration: none; 
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .back-nav:hover { color: var(--text-main); }
+
+        /* Icon Colors and Shadows */
+        .bg-red { background: var(--red-alert); box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); }
+        .bg-blue { background: var(--blue-utility); box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+        .bg-green { background: var(--green-civic); box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+        .bg-orange { background: var(--orange-safety); box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); }
+
+        .footer-tip {
+            margin-top: 40px; 
+            text-align: center; 
+            padding: 25px; 
+            background: var(--glass); 
+            border-radius: 20px; 
+            border: 1px solid var(--glass-border);
+        }
+    </style>
+</head>
+<body>
+
+<div style="padding: 12px 5%; margin: -20px -20px 20px -20px; background: var(--glass); border-bottom: 1px solid var(--glass-border);">
+    <a href="index.html" style="color: var(--text-muted); text-decoration: none; font-weight: 500;">← Back to Home</a>
+</div>
+<div class="container">
+    <header>
+        <h1>Emergency Hub</h1>
+        
+        <p>Verified helplines for Bengaluru city assistance.</p>
+    </header>
+
+    <span class="category-tag" style="color: var(--red-alert);">Critical Services</span>
+    <div class="emergency-grid">
+        <a href="tel:112" class="hotline-card" style="border-left: 5px solid var(--red-alert);">
+            <div class="info">
+                <h3>National Emergency (Nodal)</h3>
+                <p>Police, Fire, or Medical Emergency</p>
+                <span class="phone-no">112</span>
+            </div>
+            <div class="call-btn bg-red">📞</div>
+        </a>
+        <a href="tel:108" class="hotline-card" style="border-left: 5px solid var(--red-alert);">
+            <div class="info">
+                <h3>Ambulance Service</h3>
+                <p>Emergency medical transport</p>
+                <span class="phone-no">108</span>
+            </div>
+            <div class="call-btn bg-red">📞</div>
+        </a>
+    </div>
+
+    <span class="category-tag" style="color: var(--blue-utility);">Utilities & Power</span>
+    <div class="emergency-grid">
+        <a href="tel:1912" class="hotline-card" style="border-left: 5px solid var(--blue-utility);">
+            <div class="info">
+                <h3>BESCOM</h3>
+                <p>Power cuts, sparks, or wire hazards</p>
+                <span class="phone-no">1912</span>
+            </div>
+            <div class="call-btn bg-blue">📞</div>
+        </a>
+        <a href="tel:1916" class="hotline-card" style="border-left: 5px solid var(--blue-utility);">
+            <div class="info">
+                <h3>BWSSB</h3>
+                <p>Water leakage or Sewage overflow</p>
+                <span class="phone-no">1916</span>
+            </div>
+            <div class="call-btn bg-blue">📞</div>
+        </a>
+    </div>
+
+    <span class="category-tag" style="color: var(--green-civic);">BBMP & Traffic</span>
+    <div class="emergency-grid">
+        <a href="tel:1533" class="hotline-card" style="border-left: 5px solid var(--green-civic);">
+            <div class="info">
+                <h3>BBMP Sahaya</h3>
+                <p>Fallen trees, garbage, or floods</p>
+                <span class="phone-no">1533</span>
+            </div>
+            <div class="call-btn bg-green">📞</div>
+        </a>
+        <a href="tel:103" class="hotline-card" style="border-left: 5px solid var(--green-civic);">
+            <div class="info">
+                <h3>Traffic Police</h3>
+                <p>Accidents, towing, or signal issues</p>
+                <span class="phone-no">103</span>
+            </div>
+            <div class="call-btn bg-green">📞</div>
+        </a>
+    </div>
+
+    <span class="category-tag" style="color: var(--orange-safety);">Safety & Specialized</span>
+    <div class="emergency-grid">
+        <a href="tel:1091" class="hotline-card" style="border-left: 5px solid var(--orange-safety);">
+            <div class="info">
+                <h3>Women Helpline</h3>
+                <p>Safety assistance & Vanitha Sahayavani</p>
+                <span class="phone-no">1091</span>
+            </div>
+            <div class="call-btn bg-orange">📞</div>
+        </a>
+        <a href="tel:1930" class="hotline-card" style="border-left: 5px solid var(--orange-safety);">
+            <div class="info">
+                <h3>Cyber Crime</h3>
+                <p>Online fraud or financial scams</p>
+                <span class="phone-no">1930</span>
+            </div>
+            <div class="call-btn bg-orange">📞</div>
+        </a>
+        <a href="tel:1090" class="hotline-card" style="border-left: 5px solid var(--orange-safety);">
+            <div class="info">
+                <h3>Senior Citizen</h3>
+                <p>Elderly assistance & safety</p>
+                <span class="phone-no">1090</span>
+            </div>
+            <div class="call-btn bg-orange">📞</div>
+        </a>
+    </div>
+
+    <div class="footer-tip">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">
+            <strong>Pro Tip:</strong> In Bengaluru, dial <strong>112</strong> for any coordinated emergency response.
+        </p>
+        <p style="font-size: 0.75rem; color: var(--text-muted);">
+            Emergency Hub by CivicEye. Data updated 2026.
+        </p>
+    </div>
+</div>
+
+<script>
+</script>
+
+</body>
+</html>

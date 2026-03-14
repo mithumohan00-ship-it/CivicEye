@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicEye | AI Predictive Maintenance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* Default Dark Theme variables */
+            --bg: #0f172a;
+            --glass: rgba(30, 41, 59, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+        }
+
+        [data-theme="light"] {
+            /* Professional Light Theme variables */
+            --bg: #f1f5f9;
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(15, 23, 42, 0.08);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --primary: #4f46e5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background: var(--bg); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            padding: 2rem; 
+            background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0, transparent 50%);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        
+        .card { 
+            background: var(--glass); 
+            border: 1px solid var(--glass-border); 
+            padding: 2rem; 
+            border-radius: 24px; 
+            backdrop-filter: blur(10px); 
+            transition: background 0.3s ease;
+        }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        
+        .ai-badge { 
+            background: linear-gradient(90deg, #6366f1, #a855f7); 
+            color: white; 
+            padding: 4px 12px; 
+            border-radius: 50px; 
+            font-size: 0.7rem; 
+            font-weight: 800; 
+            display: inline-block; 
+            margin-bottom: 1rem; 
+        }
+
+        .prediction-item { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 1rem 0; 
+            border-bottom: 1px solid var(--glass-border); 
+            color: var(--text-main);
+        }
+
+        .risk-high { color: #ef4444; font-weight: bold; }
+        
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div style="padding: 12px 5%; margin: -2rem -2rem 2rem -2rem; background: var(--glass); border-bottom: 1px solid var(--glass-border);">
+        <a href="index.html" style="color: var(--text-muted); text-decoration: none; font-weight: 500;">← Back to Home</a>
+    </div>
+    <div class="card" style="margin-bottom: 2rem;">
+        <span class="ai-badge">NEURAL PREDICTION ACTIVE</span>
+        <h1>Urban Infrastructure Risk Forecast</h1>
+        <p style="color: var(--text-muted); margin-top: 0.5rem;">AI analyzing report density and historical patterns to predict infrastructure failure points.</p>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>High-Risk Hotspots (Next 7 Days)</h3>
+            
+            <div id="predictionList" style="margin-top: 1.5rem;">
+                <div class="prediction-item"><span>Indiranagar (Drainage Overload)</span> <span class="risk-high">88% Risk</span></div>
+                <div class="prediction-item"><span>Whitefield (Transformer Stress)</span> <span class="risk-high" style="color:#f59e0b">62% Risk</span></div>
+                <div class="prediction-item"><span>Electronic City (Road Degradation)</span> <span class="risk-high">74% Risk</span></div>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Probability Trend</h3>
+            <canvas id="riskChart" height="200"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const textColor = '#475569';
+
+        new Chart(document.getElementById('riskChart'), {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Predicted Failures',
+                    data: [12, 19, 15, 25, 32, 28, 45],
+                    borderColor: '#6366f1',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)'
+                }]
+            },
+            options: { 
+                plugins: { legend: { display: false } }, 
+                scales: { 
+                    y: { display: false }, 
+                    x: { 
+                        grid: { display: false }, 
+                        ticks: { color: textColor } 
+                    } 
+                } 
+            }
+        });
+
+    </script>
+</body>
+</html>

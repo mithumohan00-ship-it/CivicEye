@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicEye | Top Guardians Leaderboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --glass: rgba(30, 41, 59, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+        }
+        [data-theme="light"] {
+            --bg: #f1f5f9;
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(15, 23, 42, 0.08);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --primary: #4f46e5;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); color: var(--text-main); min-height: 100vh; padding: 20px; transition: background 0.3s ease, color 0.3s ease;
+            background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0, transparent 40%); }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; margin: -20px -20px 30px -20px; background: var(--glass); backdrop-filter: blur(12px); border-bottom: 1px solid var(--glass-border); }
+        .logo { font-size: 1.2rem; font-weight: 700; color: var(--text-main); text-decoration: none; }
+        .nav-links { display: flex; gap: 12px; align-items: center; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; }
+        .nav-links a:hover { color: var(--text-main); }
+        .container { max-width: 600px; margin: 0 auto; }
+        h1 { margin-bottom: 10px; }
+        p.sub { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+        .card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; padding: 30px; backdrop-filter: blur(10px); }
+        .leaderboard-row { display: grid; grid-template-columns: 40px 1fr 100px; padding: 14px 0; border-bottom: 1px solid var(--glass-border); align-items: center; }
+        .leaderboard-row:last-child { border-bottom: none; }
+        .rank-badge { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; background: var(--glass-border); font-size: 0.7rem; color: var(--text-muted); }
+        .gold { background: var(--primary) !important; color: white !important; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div style="padding: 12px 5%; margin: -20px -20px 24px -20px; background: var(--glass); border-bottom: 1px solid var(--glass-border);">
+        <a href="index.html" style="color: var(--text-muted); text-decoration: none; font-weight: 500;">← Back to Home</a>
+    </div>
+    <div class="container">
+        <h1>🏆 Top Guardians</h1>
+        <p class="sub">Citizens making the biggest impact in civic reporting.</p>
+        <div class="card">
+            <div class="leaderboard-row"><div class="rank-badge gold">1</div><span>Mithun Mohan</span><span style="color:#10b981; font-weight:bold; font-size:0.8rem;">4,250 PTS</span></div>
+            <div class="leaderboard-row"><div class="rank-badge">2</div><span>Suresh K.</span><span style="font-size:0.8rem;">3,100 PTS</span></div>
+            <div class="leaderboard-row"><div class="rank-badge">3</div><span>Ananya Rao</span><span style="font-size:0.8rem;">2,850 PTS</span></div>
+            <div class="leaderboard-row"><div class="rank-badge">4</div><span>Vikram Singh</span><span style="font-size:0.8rem;">1,900 PTS</span></div>
+        </div>
+    </div>
+    <script></script>
+</body>
+</html>
